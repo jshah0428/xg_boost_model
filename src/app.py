@@ -21,6 +21,7 @@ uploaded_data = None
 model = None
 
 app.layout = html.Div([
+    html.H1("Group 4: Jainam Shah, Dev Nakrani, Jarnel Rancy, Manan Thakore, Abhinav Karthik"),
     html.H1("Regression Prediction App"),
 
     html.Div([
