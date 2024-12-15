@@ -15,6 +15,7 @@ from sklearn.metrics import r2_score
 import plotly.express as px
 
 app = dash.Dash(__name__)
+server = app.server
 
 uploaded_data = None
 model = None
