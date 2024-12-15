@@ -247,31 +247,41 @@ def train_model(n_clicks, target, selected_features):
 @app.callback(
     Output('prediction-output', 'children'),
     [Input('predict-button', 'n_clicks')],
-    [State('predict-input', 'value'),  # Input feature values
-     State('features-checkboxes', 'value')]  # Selected feature names
+    [State('predict-input', 'value'),  
+     State('features-checkboxes', 'value')]  
 )
 def make_prediction(n_clicks, input_values, selected_features):
-    global model  # Use the trained model
+    global model  
 
     if n_clicks is None or not input_values or not selected_features:
         return "Please enter feature values and select features before predicting."
 
     try:
-        input_data = [float(value) for value in input_values.split(',')]
+        input_data = input_values.split(',')
+        processed_data = []
 
-        if len(input_data) != len(selected_features):
-            return f"Error: Expected {len(selected_features)} features, but got {len(input_data)}."
+        for value in input_data:
+            try:
+                processed_data.append(float(value))
+            except ValueError:
+                processed_data.append(value)  
 
-        input_df = pd.DataFrame([input_data], columns=selected_features)
+        if len(processed_data) != len(selected_features):
+            return f"Error: Expected {len(selected_features)} features, but got {len(processed_data)}."
+
+        input_df = pd.DataFrame([processed_data], columns=selected_features)
+        input_df = pd.get_dummies(input_df)
+
+        missing_cols = set(model.feature_names_in_) - set(input_df.columns)
+        for col in missing_cols:
+            input_df[col] = 0
+        input_df = input_df[model.feature_names_in_]
 
         prediction = model.predict(input_df)
         return f"Prediction: {prediction[0]}"
-    except ValueError as e:
-        return f"Error: Invalid input format. Ensure all inputs are numeric and separated by commas. ({str(e)})"
     except Exception as e:
         return f"Error: {str(e)}"
-
-
+    
 # _______________Run App_____________________________
 
 if __name__ == '__main__':
